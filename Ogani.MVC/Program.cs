@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Ogani.BLL;
 using Ogani.DAL;
 using Ogani.DAL.DataContext;
 
@@ -7,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddDalServices(builder.Configuration);
+builder.Services.AddBllServices(builder.Configuration);
+
 
 var app = builder.Build();
 using (var scope = app.Services.CreateScope())

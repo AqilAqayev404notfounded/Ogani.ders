@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore.Query;
 using Ogani.BLL.Services.Contracts;
 using Ogani.BLL.ViewModels;
 using Ogani.DAL.DataContext.Entities;
@@ -6,6 +7,7 @@ using Ogani.DAL.Repositories.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -45,24 +47,37 @@ namespace Ogani.BLL.Services
             return deletedEntityViewModel;
         }
 
-        public virtual Task<List<TViewModel>> GetAllAsync(System.Linq.Expressions.Expression<Func<TEntity, bool>>? predicate = null, Func<IQueryable<TEntity>, Microsoft.EntityFrameworkCore.Query.IIncludableQueryable<TEntity, object>>? include = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null)
+        public virtual async Task<List<TViewModel>> GetAllAsync(Expression<Func<TEntity, bool>>? predicate = null, Func<IQueryable<TEntity>, Microsoft.EntityFrameworkCore.Query.IIncludableQueryable<TEntity, object>>? include = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null)
         {
-            throw new NotImplementedException();
+            var entityList = await _repository.GetAllAsync(predicate, include, orderBy);
+            var viewModels = _mapper.Map<List<TViewModel>>(entityList);
+
+            return viewModels;
         }
 
-        public virtual Task<TViewModel?> GetAsync(int id)
+        public virtual async Task<TViewModel?> GetAsync(int id)
         {
-            throw new NotImplementedException();
+            var entity = await _repository.GetAsync(id);
+            var viewModel = _mapper.Map<TViewModel>(entity);
+
+            return viewModel;
         }
 
-        public virtual Task<TViewModel?> GetAsync(System.Linq.Expressions.Expression<Func<TEntity, bool>> predicate, Func<IQueryable<TEntity>, Microsoft.EntityFrameworkCore.Query.IIncludableQueryable<TEntity, object>>? include = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null)
+        public virtual async Task<TViewModel?> GetAsync(Expression<Func<TEntity, bool>> predicate, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null)
         {
-            throw new NotImplementedException();
+            var entity = await _repository.GetAsync(predicate, include, orderBy);
+            var viewModel = _mapper.Map<TViewModel>(entity);
+
+            return viewModel;
         }
 
-        public virtual Task<TViewModel> UpdateAsync(TUpdateViewModel entity)
+        public virtual async Task<TViewModel> UpdateAsync(TUpdateViewModel updateViewModel)
         {
-            throw new NotImplementedException();
+            var entity = _mapper.Map<TEntity>(updateViewModel);
+            var updateEntity = await _repository.UpdateAsync(entity);
+            var updatedViewModel = _mapper.Map<TViewModel>(updateEntity);
+
+            return updatedViewModel;
         }
     }
 }
